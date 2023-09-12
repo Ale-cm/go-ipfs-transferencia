@@ -1,0 +1,33 @@
+openapi: '3.0.2'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://localhost:.7861/v1
+paths:
+   /uploadText:
+    post:
+      summary: save text base64 in ipfs filesystem
+      requestBody:
+        content:
+          application/json:
+            schema:      # Request body contents
+              type: object
+              properties:
+                type:
+                  type: string
+                content:
+                  type: string
+              example:   # Sample object
+                type: "text"
+                content: "Y3VpZGFkbyBjb24gbGFzIGlkYXMgeSB2dWVsdGFz"
+      responses:
+        '200':
+          description: OK
+   /hello:
+     get:
+       description: 'Hello world'
+       parameters: []
+       responses:
+         '200':
+           description: OK 
