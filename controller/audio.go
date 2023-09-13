@@ -14,7 +14,7 @@ import (
 )
 
 const localPath = "./download"
-const publicKey = "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH"
+const publicKey = ""
 
 type AudioController struct {
 }
