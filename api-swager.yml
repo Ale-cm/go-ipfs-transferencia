@@ -3,7 +3,7 @@ info:
   title: API Title
   version: '1.0'
 servers:
-  - url: https://localhost:.7861/v1
+  - url: https://localhost:7861/v1
 paths:
    /uploadText:
     post:
@@ -30,4 +30,19 @@ paths:
        parameters: []
        responses:
          '200':
-           description: OK 
+           description: OK
+   /text/{hash}:
+     get:
+      description: 'Recuperar el texto'
+      parameters:
+        - name: hash
+          in: path
+          required: true
+          description: Descripción del parámetro hash
+          schema:
+            type: string
+      responses:
+         '200':
+           description: OK
+ 
+           
