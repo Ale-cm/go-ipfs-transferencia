@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -47,34 +46,6 @@ func (ac *AudioController) HelloWorld(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Hello, World"})
 }
 
-func (ac *AudioController) UploadText(c *gin.Context) {
-	err := c.Request.ParseMultipartForm(10 << 20)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	fmt.Println(c.Request.Body)
-	file, err := c.FormFile("text")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	storagePath := "./uploads/text"
-	if err := os.MkdirAll(storagePath, os.ModePerm); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	filePath := storagePath + "/" + file.Filename
-	if err := c.SaveUploadedFile(file, filePath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Archivo de audio guardado exitosamente", "filePath": filePath})
-}
-
 func (ac *AudioController) UploadTextB64(c *gin.Context) {
 	var text = models.File{}
 	err := c.Bind(&text)
@@ -90,7 +61,7 @@ func (ac *AudioController) UploadTextB64(c *gin.Context) {
 
 	decodedString := string(decodedBytes)
 
-	var sh *ipfs.Shell = ipfs.NewShell("localhost:5001")
+	sh := ipfs.NewShell("localhost:5001")
 
 	// Agregar el texto a IPFS
 	hash, err := addFile(sh, decodedString)
@@ -105,12 +76,28 @@ func (ac *AudioController) UploadTextB64(c *gin.Context) {
 
 }
 
+func (ac *AudioController) GetTextByhash(c *gin.Context) {
+	sh := ipfs.NewShell("localhost:5001")
+
+	hash := c.Param("hash")
+
+	// Agregar el texto a IPFS
+	content, err := readFile(sh, hash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Se obtuvo con exito", "texto": content})
+
+}
+
 func addFile(sh *ipfs.Shell, text string) (string, error) {
 	return sh.Add(strings.NewReader(text))
 }
 
 func readFile(sh *ipfs.Shell, cid string) (*string, error) {
-	reader, err := sh.Cat(fmt.Sprint("/ipfs/%s", cid))
+	reader, err := sh.Cat(fmt.Sprint("/ipfs/", cid))
 	if err != nil {
 		return nil, fmt.Errorf("error reading the file %s", err.Error())
 	}

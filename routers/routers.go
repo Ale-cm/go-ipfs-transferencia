@@ -13,7 +13,7 @@ func SetupRouter(r *gin.Engine) {
 	{
 		v1.GET("/hello", audioController.HelloWorld)
 		v1.POST("/uploadText", audioController.UploadTextB64)
-
+		v1.GET("/text/:hash", audioController.GetTextByhash)
 	}
 
 }
