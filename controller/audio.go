@@ -1,26 +1,24 @@
 package controller
 
 import (
-	"api-audio-go/models"
+	"baseModule/models"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
-	"io"
-
 	ipfs "github.com/ipfs/go-ipfs-api"
 )
 
+const localPath = "./download"
+const publicKey = "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH"
+
 type AudioController struct {
 }
-
-const localPath = "./download"
-
-const publicKey = ""
 
 type Respon struct {
 	Status  string `json:"status"`
@@ -50,7 +48,6 @@ func (ac *AudioController) HelloWorld(c *gin.Context) {
 }
 
 func (ac *AudioController) UploadText(c *gin.Context) {
-	// Obtiene el archivo de audio del formulario con el nombre "audio"
 	err := c.Request.ParseMultipartForm(10 << 20)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -63,22 +60,17 @@ func (ac *AudioController) UploadText(c *gin.Context) {
 		return
 	}
 
-	// Crea un directorio de almacenamiento si no existe
-	storagePath := "./uploads/text" // Cambia esto a la ubicación deseada
+	storagePath := "./uploads/text"
 	if err := os.MkdirAll(storagePath, os.ModePerm); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Guarda el archivo de audio en el directorio de almacenamiento
 	filePath := storagePath + "/" + file.Filename
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	// En este punto, el archivo de audio ha sido guardado con éxito
-	// Puedes realizar otras operaciones aquí, como procesar el audio o registrar su ubicación
 
 	c.JSON(http.StatusOK, gin.H{"message": "Archivo de audio guardado exitosamente", "filePath": filePath})
 }
@@ -98,7 +90,7 @@ func (ac *AudioController) UploadTextB64(c *gin.Context) {
 
 	decodedString := string(decodedBytes)
 
-	sh := ipfs.NewShell("localhost:5001")
+	var sh *ipfs.Shell = ipfs.NewShell("localhost:5001")
 
 	// Agregar el texto a IPFS
 	hash, err := addFile(sh, decodedString)

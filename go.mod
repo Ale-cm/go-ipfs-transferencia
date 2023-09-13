@@ -1,4 +1,4 @@
-module api-audio-go
+module baseModule
 
 go 1.19
 

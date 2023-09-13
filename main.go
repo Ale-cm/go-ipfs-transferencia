@@ -1,10 +1,10 @@
 package main
 
 import (
-	"api-audio-go/routers"
+	"baseModule/routers"
 	"log"
 
-	"api-audio-go/models"
+	"baseModule/models"
 
 	"github.com/gin-gonic/gin"
 )

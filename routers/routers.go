@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"api-audio-go/controller"
+	"baseModule/controller"
 
 	"github.com/gin-gonic/gin"
 )
